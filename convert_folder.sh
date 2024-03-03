@@ -36,10 +36,10 @@ Process-File() {
 		echo "Processing: $file"
 		audioType=$(mediainfo --Inform="Audio;%Format%" "$file")
 		videoType=$(mediainfo --Inform="Video;%Format%" "$file")
-		if [ $audioType == "AC-3" ]; then
+		if [ "$audioType" == "AC-3" ]; then
 			local audioFfmpegFlags="-c:a copy"
 		fi
-		if [ $videoType == "HEVC" ]; then
+		if [ "$videoType" == "HEVC" ]; then
 			local videoFfmpegFlags="-c:v copy"
 		fi
 		date
