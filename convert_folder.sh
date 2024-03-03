@@ -1,29 +1,28 @@
 #!/bin/bash
 #Simple ffmpeg wrapper with my favorite options
 
-#Settings to alwasy use
 universalFfmpegFlags="-movflags +faststart -x265-params log-level=error -v 8 -stats"
-
 excluldeFileTypes=".mp4"
-
-#Audio/Video Output Settings
-#outputFileType="mkv"
-outputFileType="mp4"
-##*Should* be "seemingly" lossless video
+includeFileTypes="*"
 videoFfmpegFlags="-c:v libx265 -preset slow -crf 24"
-#videoFfmpegFlags="-c:v libx264 -preset slow -crf 18:
-##Average Quality video
-#videoFfmpegFlags="-c:v libx264 -preset slow -crf 23"
-##Audio
-#audioFfmpegFlags="-c:a ac3 -b:a 640k"
 audioFfmpegFlags="-c:a ac3"
-#audioFfmpegFlags="-c:a copy"
+
+##Remux
+#ffmpeg -i "$file" -c:v copy -c:a copy $universalFlags "$file".mkv
+
+##*Should* be "seemingly" lossless
+#ffmpeg -i "$file" -c:v libx265 -preset slow -crf 24 -c:a copy $universalFlags "$file".mkv
+#ffmpeg -i "$file" -c:v libx265 -preset slow -crf 24 -c:a ac3 -b:a 640k $universalFlags "$file".mp4
+#ffmpeg -i "$file" -c:v libx264 -preset slow -crf 18 -c:a copy $universalFlags "$file".mp4
+#ffmpeg -i "$file" -c:v libx264 -preset slow -crf 18 -c:a ac3 -b:a 640k $universalFlags "$file".mp4
+
+##Average Quality
+#ffmpeg -i "$file" -c:v libx264 -preset slow -crf 23 -c:a copy $universalFlags "$file".mp4
+#ffmpeg -i "$file" -c:v libx264 -preset slow -crf 23 -c:a ac3 -b:a 640k $universalFlags "$file".mp4
 
 ##Audiobooks
-#outputFileType="m4b"
-#outputFileType="mp3"
-#videoFfmpegFlags=""
-#audioFfmpegFlags="-c:a copy"
+#ffmpeg -i "$file" -c:a copy $universalFlags "$file".m4b
+#ffmpeg -i "$file" -c:a ac3 -b:a 640k $universalFlags "$file".mp4
 
 Process-File() {
 	#takes files indentified in Function Process-Folder, filters on included/excluded file types, and runs them through ffmpeg
@@ -35,8 +34,8 @@ Process-File() {
 		echo "Skipped: $file"
 	else
 		echo "Processing: $file"
-		$audioType=$(mediainfo --Inform="Audio;%Format%" "$file")
-		$videoType=$(mediainfo --Inform="Video;%Format%" "$file")
+		audioType=$(mediainfo --Inform="Audio;%Format%" "$file")
+		videoType=$(mediainfo --Inform="Video;%Format%" "$file")
 		if [ $audioType == "AC-3" ]; then
 			local audioFfmpegFlags="-c:a copy"
 		fi
@@ -44,7 +43,8 @@ Process-File() {
 			local videoFfmpegFlags="-c:v copy"
 		fi
 		date
-		ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file"."$outputFileType"
+		echo \"ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file".mp4\"
+		ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file".mp4
 		#read -n1 -r -p "Press any key to continue..." key
 	fi
 }
