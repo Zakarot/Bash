@@ -72,5 +72,3 @@ if [ ! -d "$root" ]; then
 else
 	Process-Folder "$root"
 fi
-
-
