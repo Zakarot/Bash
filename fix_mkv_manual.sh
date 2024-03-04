@@ -1,5 +1,5 @@
 #!/bin/bash
-#Check mkv files for audio format and number of channels.
+#Fix Metadata statistics for mkv files
 
 Process-Folder() {
 	#Takes single file/folder parameter and checks to see which if any child objects are folders and recursively calls the function on them.
@@ -21,8 +21,7 @@ Process-File() {
 	#Processes files indentified in Function Process-Folder 
 	local file="$1"
 	echo "$file"
-    mediainfo --Inform="Audio;%Format%" "$file"
-    mediainfo --Inform="Audio;%Channels%" "$file"
+	mkvpropedit --add-track-statistics-tags "$file"
 }
 
 root=$(pwd)
