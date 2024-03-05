@@ -1,12 +1,11 @@
 #!/bin/bash
 #Simple ffmpeg wrapper with my favorite options
 
-universalFfmpegFlags="-movflags +faststart -x265-params log-level=error -v 8 -stats"
-excluldeFileTypes=""
-includeFileTypes=".avi"
-outputFileType="mp4"
+includeFileTypes=".mp4"
+outputFileType=".mkv"
 videoFfmpegFlags="-c:v libx265 -preset slow -crf 24"
 audioFfmpegFlags="-c:a ac3"
+universalFfmpegFlags="-movflags +faststart -x265-params log-level=error -v 8 -stats"
 
 ##Remux
 #ffmpeg -i "$file" -c:v copy -c:a copy $universalFlags "$file".mkv
@@ -39,9 +38,9 @@ Process-File() {
 			local videoFfmpegFlags="-c:v copy"
 		fi
 		date
-		echo \"ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file"."$outputFileType"\"
+		echo \"ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file$outputFileType"\"
 		read -n1 -r -p "Press any key to continue..." key
-		ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file"."$outputFileType"
+		ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file$outputFileType"
 		mkvpropedit --add-track-statistics-tags "$file".mkv
 	else
 		#Skip Excluded File Types
