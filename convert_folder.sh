@@ -2,8 +2,9 @@
 #Simple ffmpeg wrapper with my favorite options
 
 universalFfmpegFlags="-movflags +faststart -x265-params log-level=error -v 8 -stats"
-excluldeFileTypes=".mp4"
-includeFileTypes="*"
+excluldeFileTypes=""
+includeFileTypes=".avi"
+outputFileType="mp4"
 videoFfmpegFlags="-c:v libx265 -preset slow -crf 24"
 audioFfmpegFlags="-c:a ac3"
 
@@ -27,12 +28,7 @@ audioFfmpegFlags="-c:a ac3"
 Process-File() {
 	#takes files indentified in Function Process-Folder, filters on included/excluded file types, and runs them through ffmpeg
 	local file="$1"
-	echo "Local File var is: $file"
-	echo "Global excluldeFileTypes var is: $excluldeFileTypes"
-	if [[ "$file" =~ "$excluldeFileTypes" ]]; then
-		#Skip Excluded File Types
-		echo "Skipped: $file"
-	else
+	if [[ "$file" =~ "$includeFileTypes" ]]; then
 		echo "Processing: $file"
 		audioType=$(mediainfo --Inform="Audio;%Format%" "$file")
 		videoType=$(mediainfo --Inform="Video;%Format%" "$file")
@@ -43,9 +39,14 @@ Process-File() {
 			local videoFfmpegFlags="-c:v copy"
 		fi
 		date
-		echo \"ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file".mp4\"
-		ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file".mp4
-		#read -n1 -r -p "Press any key to continue..." key
+		echo \"ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file"."$outputFileType"\"
+		read -n1 -r -p "Press any key to continue..." key
+		ffmpeg -i "$file" $videoFfmpegFlags $audioFfmpegFlags $universalFfmpegFlags "$file"."$outputFileType"
+		mkvpropedit --add-track-statistics-tags "$file".mkv
+	else
+		#Skip Excluded File Types
+		echo "Skipped: $file"
+		echo "File not: $includeFileTypes"
 	fi
 }
 
